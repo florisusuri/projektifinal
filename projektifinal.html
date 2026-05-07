@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Real Madrid Quiz</title>
+
+<style>
+    body{
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #ffffff, #e6e6e6);
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+        margin:0;
+    }
+
+    .quiz-container{
+        background:white;
+        width:400px;
+        padding:30px;
+        border-radius:15px;
+        box-shadow:0 0 15px rgba(0,0,0,0.2);
+        text-align:center;
+    }
+
+    h1{
+        color:#111;
+    }
+
+    #question{
+        font-size:20px;
+        margin:20px 0;
+    }
+
+    .btn{
+        display:block;
+        width:100%;
+        padding:12px;
+        margin:10px 0;
+        border:none;
+        border-radius:10px;
+        background:#222;
+        color:white;
+        font-size:16px;
+        cursor:pointer;
+        transition:0.3s;
+    }
+
+    .btn:hover{
+        background:#444;
+    }
+
+    #next-btn{
+        background:gold;
+        color:black;
+        display:none;
+    }
+
+    #score{
+        font-size:24px;
+        font-weight:bold;
+    }
+</style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>⚽ Real Madrid Quiz ⚽</h1>
+
+    <div id="question">Question here</div>
+
+    <div id="answer-buttons"></div>
+
+    <button id="next-btn">Next</button>
+
+    <div id="score"></div>
+</div>
+
+<script>
+const questions = [
+    {
+        question: "How many Champions League titles has Real Madrid won?",
+        answers: [
+            { text: "10", correct: false },
+            { text: "12", correct: false },
+            { text: "15", correct: true },
+            { text: "18", correct: false }
+        ]
+    },
+    {
+        question: "Who is Real Madrid's all-time top scorer?",
+        answers: [
+            { text: "Benzema", correct: false },
+            { text: "Cristiano Ronaldo", correct: true },
+            { text: "Raul", correct: false },
+            { text: "Modric", correct: false }
+        ]
+    },
+    {
+        question: "What is Real Madrid's stadium called?",
+        answers: [
+            { text: "Camp Nou", correct: false },
+            { text: "Anfield", correct: false },
+            { text: "Santiago Bernabéu", correct: true },
+            { text: "Old Trafford", correct: false }
+        ]
+    }
+];
+
+const questionElement = document.getElementById("question");
+const answerButtons = document.getElementById("answer-buttons");
+const nextButton = document.getElementById("next-btn");
+const scoreElement = document.getElementById("score");
+
+let currentQuestionIndex = 0;
+let score = 0;
+
+function startQuiz(){
+    currentQuestionIndex = 0;
+    score = 0;
+    nextButton.innerHTML = "Next";
+    showQuestion();
+}
+
+function showQuestion(){
+    resetState();
+
+    let currentQuestion = questions[currentQuestionIndex];
+    questionElement.innerHTML = currentQuestion.question;
+
+    currentQuestion.answers.forEach(answer => {
+        const button = document.createElement("button");
+        button.innerHTML = answer.text;
+        button.classList.add("btn");
+
+        answerButtons.appendChild(button);
+
+        if(answer.correct){
+            button.dataset.correct = answer.correct;
+        }
+
+        button.addEventListener("click", selectAnswer);
+    });
+}
+
+function resetState(){
+    nextButton.style.display = "none";
+
+    while(answerButtons.firstChild){
+        answerButtons.removeChild(answerButtons.firstChild);
+    }
+}
+
+function selectAnswer(e){
+    const selectedBtn = e.target;
+    const isCorrect = selectedBtn.dataset.correct === "true";
+
+    if(isCorrect){
+        selectedBtn.style.background = "green";
+        score++;
+    } else {
+        selectedBtn.style.background = "red";
+    }
+
+    Array.from(answerButtons.children).forEach(button => {
+        if(button.dataset.correct === "true"){
+            button.style.background = "green";
+        }
+
+        button.disabled = true;
+    });
+
+    nextButton.style.display = "block";
+}
+
+function showScore(){
+    resetState();
+
+    questionElement.innerHTML = "Quiz Finished!";
+    scoreElement.innerHTML = `Your Score: ${score}/${questions.length}`;
+
+    nextButton.innerHTML = "Play Again";
+    nextButton.style.display = "block";
+}
+
+function handleNextButton(){
+    currentQuestionIndex++;
+
+    if(currentQuestionIndex < questions.length){
+        showQuestion();
+    } else {
+        showScore();
+    }
+}
+
+nextButton.addEventListener("click", () => {
+    if(currentQuestionIndex < questions.length){
+        handleNextButton();
+    } else {
+        startQuiz();
+        scoreElement.innerHTML = "";
+    }
+});
+
+startQuiz();
+</script>
+
+</body>
+</html>
